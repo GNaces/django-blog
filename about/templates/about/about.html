@@ -7,7 +7,11 @@
 <div class="container mt-5">
   <div class="row">
     <div class="col-4 text-center">
-      <img src="{% static 'images/nobody.jpg' %}" width="75%" />
+      {% if "placeholder" in about.profile_image.url %}
+      <img src="{% static 'images/nobody.jpg' %}" width="75%" alt="placeholder image">
+      {% else %}
+      <img src="{{ about.profile_image.url }}" width="75%" alt="{{ about.title }}">
+      {% endif %}
     </div>
     <div class="col-8">
       <!-- Title goes between these h2 tags -->
@@ -32,12 +36,11 @@
         I'm excited to hear from you. Fill out the form
         and we can get the ball rolling!</p>
 
-        <form method="post">
-          {{ collaborate_form | crispy }}
-          {% csrf_token %}
-          <button class="btn btn-secondary"
-            type="submit">Submit</button>
-        </form>
+      <form method="post">
+        {{ collaborate_form | crispy }}
+        {% csrf_token %}
+        <button class="btn btn-secondary" type="submit">Submit</button>
+      </form>
 
     </div>
   </div>
