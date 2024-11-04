@@ -42,7 +42,7 @@
                                     <a href="{% url 'toggle_like' post.id %}" class="btn btn-primary">Like</a>
                                 {% endif %}
                             {% else %}
-                                <p><a href="{% url 'login' %}">Login to like this post</a></p>
+                                <p><a href="{% url 'account_login' %}">Login to like this post</a></p>
                             {% endif %}
                             <p>Total Likes: {{ post.total_likes }}</p>
                         </div>
