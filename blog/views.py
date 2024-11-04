@@ -1,8 +1,9 @@
-from django.shortcuts import render, get_object_or_404, reverse
+from django.shortcuts import render, get_object_or_404, reverse, redirect
 from django.views import generic
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
-from .models import Post, Comment
+from .models import Post, Like, Comment
 from .forms import CommentForm
 
 # Create your views here.
@@ -65,7 +66,9 @@ def post_detail(request, slug):
             )
 
     
-    comment_form = CommentForm(data=request.POST)
+        return redirect('post_detail', slug=slug)  # Redirect to avoid resubmission
+    else:
+        comment_form = CommentForm()  # Create a new form instance if not POST
 
     return render(
         request,
@@ -77,7 +80,6 @@ def post_detail(request, slug):
             "comment_form": comment_form,
         },
     )
-
 
 def comment_edit(request, slug, comment_id):
     """
@@ -132,3 +134,20 @@ def comment_delete(request, slug, comment_id):
         messages.add_message(request, messages.ERROR, 'You can only delete your own comments!')
 
     return HttpResponseRedirect(reverse('post_detail', args=[slug]))
+
+@login_required
+def toggle_like(request, post_id):
+    """
+    get_or_create: Checks if the Like object already exists for this user and post combination.
+        If created is True, it means the like was newly created.
+        If created is False, it means the user already liked the post, so we delete the like (unlike).
+    """
+    post = get_object_or_404(Post, id=post_id)
+    like, created = Like.objects.get_or_create(user=request.user, post=post)
+
+    if not created:
+        # If like already exists, delete it (unlike)
+        like.delete()
+
+    return redirect('post_detail', slug=post.slug)  # Redirect to the post detail page
+
